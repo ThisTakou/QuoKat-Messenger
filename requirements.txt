@@ -1,0 +1,2 @@
+cryptography>=41.0.0
+qrcode[pil]>=7.4.0
