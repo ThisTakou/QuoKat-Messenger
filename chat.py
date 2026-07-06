@@ -443,21 +443,24 @@ class P2PConnection:
     def exchange_public_keys(self) -> bool:
         """Обменяться публичными ключами ECDH"""
         try:
-            # Получаем публичный ключ пира
+            # Сначала ОТПРАВЛЯЕМ свой публичный ключ
+            my_key_bytes = self.crypto.get_public_key_bytes()
+            self.socket.send(len(my_key_bytes).to_bytes(4, 'big'))
+            self.socket.send(my_key_bytes)
+
+            # Потом ПОЛУЧАЕМ публичный ключ пира
             peer_key_size_data = self.socket.recv(4)
+            if not peer_key_size_data or len(peer_key_size_data) < 4:
+                raise ValueError("Не получен размер ключа пира")
+
             peer_key_size = int.from_bytes(peer_key_size_data, 'big')
 
             peer_public_key_bytes = b''
             while len(peer_public_key_bytes) < peer_key_size:
                 chunk = self.socket.recv(CONFIG['TCP_BUFFER_SIZE'])
                 if not chunk:
-                    break
+                    raise ValueError("Соединение разорвалось при получении ключа")
                 peer_public_key_bytes += chunk
-
-            # Отправляем свой публичный ключ
-            my_key_bytes = self.crypto.get_public_key_bytes()
-            self.socket.send(len(my_key_bytes).to_bytes(4, 'big'))
-            self.socket.send(my_key_bytes)
 
             # Вычисляем общий секрет
             self.crypto.compute_shared_secret(peer_public_key_bytes)
