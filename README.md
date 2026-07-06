@@ -8,23 +8,23 @@ RU - https://github.com/ThisTakou/QuoKat-Messenger#-quokat
 EN - https://github.com/ThisTakou/QuoKat-Messenger#-quokat-1
 
 1. Chat.py запускается
-2. 
+ 
    └─ Генерирует ECDH приватный ключ
    
    └─ Сохраняет ID в my_id.txt
 
 4. Машина A слушает на TCP 6006
-5. 
+ 
    └─ Машина B подключается к A
    
 6. Обмен публичными ECDH ключами
-7. 
+ 
    └─ A отправляет свой публичный ключ B
    
    └─ B отправляет свой публичный ключ A
    
 9. Оба вычисляют общий секрет (ECDH)
-10. 
+    
    └─ A: secret = priv_A × pub_B
 
    └─ B: secret = priv_B × pub_A
@@ -32,17 +32,17 @@ EN - https://github.com/ThisTakou/QuoKat-Messenger#-quokat-1
    └─ Результаты ОДИНАКОВЫЕ (магия ECDH)
    
 12. Секрет преобразуется в ключ AES-256
-13. 
+ 
    └─ Через HKDF-SHA256
    
 14. Сообщения шифруются AES-256-GCM
-15. 
+    
    └─ Каждое сообщение свой nonce
 
    └─ Проверка целостности (GCM tag)
 
 17. Приватные ключи НИКОГДА не передаются
-18. 
+ 
    └─ Только публичные (невозможно восстановить приватный)
 
 # 🔐 Quokat
