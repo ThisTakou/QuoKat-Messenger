@@ -46,6 +46,7 @@ CONFIG = {
     'ID_FILE': 'my_id.txt',
     'BUFFER_SIZE': 4096,
     'TCP_BUFFER_SIZE': 65536,
+    'SCREEN_WAIT_TIME': 60,     # Время перед очисткой экрана (10-3600 сек, по умолчанию 60)
 }
 
 # ============================================================================
@@ -535,6 +536,33 @@ class P2PMessenger:
         """Очистить консоль"""
         os.system('cls' if os.name == 'nt' else 'clear')
 
+    def print_sidebar(self):
+        """Вывести боковую информацию"""
+        local_ip = NetworkInfo.get_local_ip()
+        public_ip = NetworkInfo.get_public_ip() or "Loading..."
+        print("\n" + "=" * 60)
+        print("📊 INFO SIDEBAR")
+        print("=" * 60)
+        print(f"🔑 Your ID:      {self.my_id}")
+        print(f"📍 Local IP:     {local_ip}:{CONFIG['TCP_PORT']}")
+        print(f"🌍 Public IP:    {public_ip}")
+        print("=" * 60 + "\n")
+
+    def wait_before_clear(self, seconds: int = None):
+        """Ждать перед очисткой экрана с отсчетом"""
+        if seconds is None:
+            seconds = CONFIG['SCREEN_WAIT_TIME']
+
+        # Ограничиваем от 10 до 3600 сек
+        seconds = max(10, min(3600, seconds))
+
+        for i in range(seconds, 0, -1):
+            print(f"\r⏱️  Экран обновится через {i} сек...", end='', flush=True)
+            time.sleep(1)
+
+        print("\r" + " " * 50 + "\r", end='')  # Очистим строку
+        self.clear_screen()
+
     def print_header(self):
         """Вывести заголовок"""
         self.clear_screen()
@@ -595,17 +623,19 @@ class P2PMessenger:
     def mode_connect_to_peer(self):
         """Режим: подключиться к собеседнику"""
         self.print_header()
+        self.print_sidebar()
 
         target_id = input("Введите код собеседника: ").strip().upper()
 
         if not target_id:
             print("❌ Код не может быть пустым")
-            time.sleep(2)
+            self.wait_before_clear()
             return
 
         if target_id == self.my_id:
             print("❌ Нельзя подключиться к самому себе")
-            time.sleep(2)
+            self.wait_before_clear()
+            return
             return
 
         print(f"\n🔍 Поиск пользователя {target_id} в локальной сети...")
@@ -653,11 +683,12 @@ class P2PMessenger:
                 else:
                     print("❌ Не удалось подключиться")
 
-        time.sleep(2)
+        self.wait_before_clear()
 
     def mode_wait_for_connection(self):
         """Режим: ожидание входящего соединения"""
         self.print_header()
+        self.print_sidebar()
 
         print(f"⏳ Ожидание входящего соединения на порту {CONFIG['TCP_PORT']}...")
         print("(Собеседник должен знать ваш IP адрес и ваш код: " + self.my_id + ")")
@@ -679,7 +710,7 @@ class P2PMessenger:
         else:
             print("❌ Таймаут ожидания")
 
-        time.sleep(2)
+        self.wait_before_clear()
 
     def start_chat(self):
         """Начать чат"""
