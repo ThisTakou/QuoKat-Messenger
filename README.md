@@ -4,6 +4,7 @@ Quokat - Secure P2P messenger with ECDH+AES-256-GCM, QR codes &amp; 3 versions -
 <img width="1024" height="211" alt="image" src="https://github.com/user-attachments/assets/0e86baf1-2c6a-4e4b-8b44-ca766f06045a" />
 
 RU - https://github.com/ThisTakou/QuoKat-Messenger#-quokat
+
 EN - https://github.com/ThisTakou/QuoKat-Messenger#-quokat-1
 
 # 🔐 Quokat
